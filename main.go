@@ -46,22 +46,23 @@ func main() {
 	}
 
 	fmt.Printf(
-		"%-20s %-45s %-10s\n",
+		"%-12s %-45s %-10s %-20s %-10s\n",
 		"NAMESPACE",
 		"POD",
 		"RESTARTS",
+		"REASON",
+		"EXIT CODE",
 	)
 
-	fmt.Println("---------------------------------------------------------------------------------------")
+	fmt.Println("-----------------------------------------------------------------------------------------------")
 
 	for _, pod := range pods.Items {
 		var totalRestarts int32
+		reason := "-"
+		var exitCode int32
 
 		for _, container := range pod.Status.ContainerStatuses {
 			totalRestarts += container.RestartCount
-
-			reason := "-"
-			exitCode := int32(0)
 
 			if container.LastTerminationState.Terminated != nil {
 				reason = container.LastTerminationState.Terminated.Reason
@@ -69,16 +70,19 @@ func main() {
 			} else if container.State.Waiting != nil {
 				reason = container.State.Waiting.Reason
 			}
-
-			if container.RestartCount > 0 {
-				fmt.Printf(
-					"Container: %-20s Restarts:%2d  Reason:%-20s ExitCode:%d\n",
-					container.Name,
-					container.RestartCount,
-					reason,
-					exitCode,
-				)
-			}
 		}
+
+		if totalRestarts == 0 {
+			continue
+		}
+
+		fmt.Printf(
+			"%-12s %-45s %-10d %-20s %-10d\n",
+			pod.Namespace,
+			pod.Name,
+			totalRestarts,
+			reason,
+			exitCode,
+		)
 	}
 }
