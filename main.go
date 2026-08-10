@@ -52,6 +52,33 @@ func main() {
 	showRestartedPods(ctx, clientset, *namespace)
 }
 
+func exitCodeMeaning(exitCode int32) string {
+	switch exitCode {
+	case 0:
+		return "Success"
+	case 1:
+		return "Application error"
+	case 2:
+		return "Misuse / invalid argument"
+	case 126:
+		return "Permission denied / not executable"
+	case 127:
+		return "Command not found"
+	case 128:
+		return "Invalid exit argument"
+	case 130:
+		return "SIGINT / Ctrl+C"
+	case 137:
+		return "SIGKILL / commonly OOMKilled"
+	case 139:
+		return "SIGSEGV / segmentation fault"
+	case 143:
+		return "SIGTERM / graceful termination"
+	default:
+		return "Unknown"
+	}
+}
+
 func showRestartedPods(
 	ctx context.Context,
 	clientset *kubernetes.Clientset,
@@ -65,15 +92,16 @@ func showRestartedPods(
 	}
 
 	fmt.Printf(
-		"%-12s %-45s %-10s %-20s %-10s\n",
+		"%-12s %-45s %-10s %-20s %-10s %-30s\n",
 		"NAMESPACE",
 		"POD",
 		"RESTARTS",
 		"REASON",
 		"EXIT CODE",
+		"EXIT CODE MEANING",
 	)
 
-	fmt.Println("---------------------------------------------------------------------------------------------------")
+	fmt.Println("----------------------------------------------------------------------------------------------------------------")
 
 	for _, pod := range pods.Items {
 		var totalRestarts int32
@@ -96,13 +124,16 @@ func showRestartedPods(
 			continue
 		}
 
+		meaning := exitCodeMeaning(exitCode)
+
 		fmt.Printf(
-			"%-12s %-45s %-10d %-20s %-10d\n",
+			"%-12s %-45s %-10d %-20s %-10d %-30s\n",
 			pod.Namespace,
 			pod.Name,
 			totalRestarts,
 			reason,
 			exitCode,
+			meaning,
 		)
 	}
 }
