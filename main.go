@@ -2,17 +2,20 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
 func main() {
+	// Command-line flags
+	namespace := flag.String("n", "", "Kubernetes namespace")
+	flag.Parse()
 
 	// kubeconfig location
 	home, err := os.UserHomeDir()
@@ -22,35 +25,39 @@ func main() {
 
 	kubeconfig := filepath.Join(home, ".kube", "config")
 
-	// Build config
+	// Build Kubernetes config
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		panic(err)
 	}
 
-	// Create client
+	// Create Kubernetes client
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		panic(err)
 	}
 
-	// List pods in all namespaces
+	// List pods
 	pods, err := clientset.CoreV1().
-		Pods("").
+		Pods(*namespace).
 		List(context.Background(), metav1.ListOptions{})
-
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("%-20s %-45s %-10s\n", "NAMESPACE", "POD", "RESTARTS")
+	fmt.Printf(
+		"%-20s %-45s %-10s\n",
+		"NAMESPACE",
+		"POD",
+		"RESTARTS",
+	)
+
 	fmt.Println("---------------------------------------------------------------------------------------")
 
 	for _, pod := range pods.Items {
 		var totalRestarts int32
 
 		for _, container := range pod.Status.ContainerStatuses {
-
 			totalRestarts += container.RestartCount
 
 			reason := "-"
