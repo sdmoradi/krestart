@@ -20,12 +20,16 @@ go build -o krestart .
 ## Run
 
 ```bash
+git clone https://github.com/YOUR_USERNAME/krestart.git
+cd krestart
 ./krestart
 ```
 
 Or install it globally:
 
 ```bash
+git clone https://github.com/YOUR_USERNAME/krestart.git
+cd krestart
 sudo install -m 0755 krestart /usr/local/bin/krestart
 ```
 
