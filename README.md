@@ -1,6 +1,6 @@
 # krestart
 
-A lightweight Kubernetes CLI tool to find restarted containers and show their restart reason and exit code.
+A lightweight Kubernetes CLI tool to find restarted Pods and show their restart count, reason, and exit code.
 
 ## Requirements
 
@@ -19,21 +19,39 @@ go build -o krestart .
 
 ## Run
 
+Check restarted Pods across all namespaces:
+
 ```bash
-git clone https://github.com/YOUR_USERNAME/krestart.git
-cd krestart
 ./krestart
 ```
 
-Or install it globally:
+Check a specific namespace:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/krestart.git
-cd krestart
+./krestart -n production
+```
+
+Check a specific Pod:
+
+```bash
+./krestart -n production -p pod-name
+```
+
+## Install
+
+Install the binary globally:
+
+```bash
 sudo install -m 0755 krestart /usr/local/bin/krestart
 ```
 
 Then run:
+
+```bash
+krestart
+```
+
+Or for a specific namespace:
 
 ```bash
 krestart -n production
@@ -42,8 +60,11 @@ krestart -n production
 ## Example
 
 ```text
-Container: api       Restarts:12  Reason:OOMKilled  ExitCode:137
-Container: worker    Restarts: 4  Reason:Error      ExitCode:1
+NAMESPACE    POD                                           RESTARTS   REASON               EXIT CODE
+---------------------------------------------------------------------------------------------------
+stage        cms-adminapi-6ddcf7d544-fttb                 1          Error                137
+stage        cms-adminapi-6ddcf7d544-q4vvt                 1          Error                137
+stage        frontend-admin-5c5444ddf5-257c2               3          Error                  1
 ```
 
 ## Development
@@ -54,6 +75,11 @@ Run directly:
 go run .
 ```
 
+Run for a specific namespace:
+
+```bash
+go run . -n production
+```
 
 Format:
 
