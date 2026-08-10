@@ -52,28 +52,41 @@ func main() {
 	showRestartedPods(ctx, clientset, *namespace)
 }
 
-func exitCodeMeaning(exitCode int32) string {
+func exitCodeMeaning(exitCode int32, reason string) string {
 	switch exitCode {
 	case 0:
-		return "Success"
+		return "Completed / Success"
+
 	case 1:
 		return "Application error"
+
 	case 2:
 		return "Misuse / invalid argument"
+
+	case 125:
+		return "Container runtime error"
+
 	case 126:
 		return "Permission denied / not executable"
+
 	case 127:
 		return "Command not found"
-	case 128:
-		return "Invalid exit argument"
-	case 130:
-		return "SIGINT / Ctrl+C"
+
 	case 137:
-		return "SIGKILL / commonly OOMKilled"
+		if reason == "OOMKilled" {
+			return "SIGKILL / OOMKilled"
+		}
+		return "SIGKILL"
+
 	case 139:
 		return "SIGSEGV / segmentation fault"
+
 	case 143:
 		return "SIGTERM / graceful termination"
+
+	case 255:
+		return "Specific error,cri,kublet,infra,node,unknown "
+
 	default:
 		return "Unknown"
 	}
@@ -124,7 +137,7 @@ func showRestartedPods(
 			continue
 		}
 
-		meaning := exitCodeMeaning(exitCode)
+		meaning := exitCodeMeaning(exitCode, reason)
 
 		fmt.Printf(
 			"%-12s %-45s %-10d %-20s %-10d %-30s\n",
