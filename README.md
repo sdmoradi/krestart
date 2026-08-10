@@ -32,7 +32,7 @@ sudo install -m 0755 krestart /usr/local/bin/krestart
 Then run:
 
 ```bash
-krestart
+krestart -n production
 ```
 
 ## Example
