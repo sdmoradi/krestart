@@ -11,7 +11,7 @@ A lightweight Kubernetes CLI tool to find restarted Pods and show their restart 
 ## Build
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/krestart.git
+git clone https://github.com/sdmoradi/krestart.git
 cd krestart
 
 go build -o krestart .
@@ -42,6 +42,8 @@ Check a specific Pod:
 Install the binary globally:
 
 ```bash
+git clone https://github.com/sdmoradi/krestart.git
+cd krestart
 sudo install -m 0755 krestart /usr/local/bin/krestart
 ```
 
