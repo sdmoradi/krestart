@@ -51,8 +51,8 @@ func run() error {
 			return fmt.Errorf("list pod events: %w", err)
 		}
 
-		// Event conversion and sorting will be implemented in Phase 7.
-		_ = events
+		eventResults := restart.AnalyzeEvents(events)
+		output.PrintPodEvents(eventResults)
 
 		return nil
 	}
