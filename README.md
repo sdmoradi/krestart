@@ -15,34 +15,107 @@ kubectl krestart -n production
 - Inspect restart details for a specific Pod.
 - Display container termination reasons, exit codes, and exit code meanings.
 - View Kubernetes events associated with a specific Pod.
-- Support standard Kubernetes kubeconfig loading and context selection through the configuration file.
+- Use standard Kubernetes kubeconfig loading and current-context selection.
 - Specify a custom kubeconfig file with `--kubeconfig`.
 - Run as a standalone CLI or a `kubectl` plugin.
 
 ## Requirements
 
-- Go 1.22 or later to build from source.
 - `kubectl` installed to use the plugin interface.
 - Access to a Kubernetes cluster.
 - A valid Kubernetes configuration, typically `~/.kube/config`.
 - Appropriate Kubernetes RBAC permissions to list Pods and read Pod events.
 
-## Build
+Go 1.22 or later is only required when building from source.
 
-Clone the repository and build the standalone binary:
+## Installation
+
+### Download a prebuilt release
+
+Download the appropriate archive for your operating system and architecture from the [GitHub Releases](https://github.com/sdmoradi/krestart/releases) page.
+
+Available release archives:
+
+| Platform | Architecture | Archive |
+|---|---|---|
+| Linux | amd64 | `krestart_0.1.0_Linux_x86_64.tar.gz` |
+| Linux | arm64 | `krestart_0.1.0_Linux_arm64.tar.gz` |
+| macOS | amd64 | `krestart_0.1.0_Darwin_x86_64.tar.gz` |
+| macOS | arm64 | `krestart_0.1.0_Darwin_arm64.tar.gz` |
+| Windows | amd64 | `krestart_0.1.0_Windows_x86_64.zip` |
+
+Verify the downloaded archive against `checksums.txt` from the same release before installing it.
+
+Each archive contains:
+
+- `krestart` — standalone CLI executable.
+- `kubectl-krestart` — executable for the kubectl plugin interface.
+- `LICENSE`
+- `README.md`
+
+### Install as a standalone CLI
+
+On Linux or macOS, extract the downloaded archive and install the standalone binary:
 
 ```bash
-git clone https://github.com/sdmoradi/krestart.git
-cd krestart
+tar -xzf krestart_0.1.0_Linux_x86_64.tar.gz
 
-GOTOOLCHAIN=local go build -o krestart ./cmd/krestart
+sudo install -m 0755 krestart /usr/local/bin/krestart
 ```
 
-To build the `kubectl` plugin binary:
+Replace the archive name with the one matching your platform and architecture.
+
+Verify the installation:
 
 ```bash
-GOTOOLCHAIN=local go build -o kubectl-krestart ./cmd/krestart
+krestart --help
 ```
+
+Run:
+
+```bash
+krestart -n production
+```
+
+### Install as a kubectl plugin
+
+Extract the release archive and install the plugin executable:
+
+```bash
+tar -xzf krestart_0.1.0_Linux_x86_64.tar.gz
+
+mkdir -p "$HOME/.local/bin"
+install -m 0755 kubectl-krestart "$HOME/.local/bin/kubectl-krestart"
+```
+
+Ensure `$HOME/.local/bin` is included in your `PATH`:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+To persist this setting for Bash:
+
+```bash
+grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.bashrc \
+  || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+```
+
+Verify that kubectl discovers the plugin:
+
+```bash
+kubectl plugin list
+```
+
+Run it:
+
+```bash
+kubectl krestart -n production
+```
+
+The plugin accepts the same arguments as the standalone CLI.
+
+**Windows:** Extract the Windows archive and place `kubectl-krestart.exe` or `krestart.exe` in a directory included in your `PATH`.
 
 ## Usage
 
@@ -51,30 +124,28 @@ GOTOOLCHAIN=local go build -o kubectl-krestart ./cmd/krestart
 Find restarted Pods across all namespaces:
 
 ```bash
-./krestart
+krestart
 ```
 
 Find restarted Pods in a specific namespace:
 
 ```bash
-./krestart -n production
+krestart -n production
 ```
 
 Inspect a specific Pod:
 
 ```bash
-./krestart -n production -p pod-name
+krestart -n production -p pod-name
 ```
 
 Use a custom kubeconfig:
 
 ```bash
-./krestart --kubeconfig /path/to/kubeconfig -n production
+krestart --kubeconfig /path/to/kubeconfig -n production
 ```
 
 ### kubectl Plugin
-
-After installing the `kubectl-krestart` executable, invoke it through `kubectl`.
 
 Find restarted Pods across all namespaces:
 
@@ -100,70 +171,6 @@ Use a custom kubeconfig:
 kubectl krestart --kubeconfig /path/to/kubeconfig -n production
 ```
 
-The plugin accepts the same arguments as the standalone CLI.
-
-## Install
-
-### Install as a kubectl plugin
-
-Build the plugin binary:
-
-```bash
-go build -o kubectl-krestart ./cmd/krestart
-```
-
-Create a directory for user-installed executables and install the binary:
-
-```bash
-mkdir -p "$HOME/.local/bin"
-install -m 0755 kubectl-krestart "$HOME/.local/bin/kubectl-krestart"
-```
-
-Add the directory to your `PATH` if it is not already there:
-
-```bash
-export PATH="$HOME/.local/bin:$PATH"
-```
-
-To persist this setting for Bash:
-
-```bash
-grep -qxF 'export PATH="$HOME/.local/bin:$PATH"' ~/.bashrc \
-  || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-```
-
-Verify that the plugin is discoverable:
-
-```bash
-kubectl plugin list
-```
-
-Run it:
-
-```bash
-kubectl krestart
-```
-
-### Install as a standalone CLI
-
-Build the standalone binary:
-
-```bash
-go build -o krestart ./cmd/krestart
-```
-
-Install it system-wide:
-
-```bash
-sudo install -m 0755 krestart /usr/local/bin/krestart
-```
-
-Run it from any directory:
-
-```bash
-krestart -n production
-```
-
 ## Kubernetes Configuration
 
 `krestart` uses the standard Kubernetes client configuration loading rules.
@@ -185,7 +192,11 @@ kubectl config use-context staging
 kubectl krestart -n production
 ```
 
-**Note:** Selecting a context through `kubectl config use-context` changes the current context in the kubeconfig. If you need to target a context without changing the current selection, explicit context support should be implemented and tested in `krestart`.
+You can also use a separate kubeconfig file without changing your default configuration:
+
+```bash
+kubectl krestart --kubeconfig /path/to/kubeconfig -n production
+```
 
 ## Example Output
 
@@ -206,26 +217,30 @@ stage        frontend-admin-5c5444ddf5-8hqpz               6          Error     
 
 ## Development
 
-### Project Structure
+### Requirements
 
-```text
-krestart/
-├── cmd/
-│   └── krestart/
-│       └── main.go
-├── internal/
-│   ├── kubernetes/
-│   │   ├── client.go
-│   │   └── pods.go
-│   ├── restart/
-│   │   ├── models.go
-│   │   └── analyzer.go
-│   └── output/
-│       └── table.go
-├── go.mod
-├── go.sum
-├── README.md
-└── LICENSE
+- Go 1.22 or later.
+- Git.
+
+### Build from Source
+
+Clone the repository:
+
+```bash
+git clone https://github.com/sdmoradi/krestart.git
+cd krestart
+```
+
+Build the standalone CLI:
+
+```bash
+go build -o krestart ./cmd/krestart
+```
+
+Build the kubectl plugin:
+
+```bash
+go build -o kubectl-krestart ./cmd/krestart
 ```
 
 ### Run Without Building
@@ -238,6 +253,28 @@ Run for a specific namespace:
 
 ```bash
 go run ./cmd/krestart -n production
+```
+
+### Project Structure
+
+```text
+krestart/
+├── cmd/
+│   └── krestart/
+│       └── main.go
+├── internal/
+│   ├── kubernetes/
+│   │   ├── client.go
+│   │   └── pods.go
+│   ├── restart/
+│   │   ├── analyzer.go
+│   │   └── analyzer_test.go
+│   └── output/
+│       └── table.go
+├── go.mod
+├── go.sum
+├── README.md
+└── LICENSE
 ```
 
 ### Format Code
