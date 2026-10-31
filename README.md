@@ -38,11 +38,11 @@ Available release archives:
 
 | Platform | Architecture | Archive |
 |---|---|---|
-| Linux | amd64 | `krestart_0.1.0_Linux_x86_64.tar.gz` |
-| Linux | arm64 | `krestart_0.1.0_Linux_arm64.tar.gz` |
-| macOS | amd64 | `krestart_0.1.0_Darwin_x86_64.tar.gz` |
-| macOS | arm64 | `krestart_0.1.0_Darwin_arm64.tar.gz` |
-| Windows | amd64 | `krestart_0.1.0_Windows_x86_64.zip` |
+| Linux | amd64 | `krestart_0.1.0_linux_amd64.tar.gz` |
+| Linux | arm64 | `krestart_0.1.0_linux_arm64.tar.gz` |
+| macOS | amd64 | `krestart_0.1.0_darwin_amd64.tar.gz` |
+| macOS | arm64 | `krestart_0.1.0_darwin_arm64.tar.gz` |
+| Windows | amd64 | `krestart_0.1.0_windows_amd64.zip` |
 
 Verify the downloaded archive against `checksums.txt` from the same release before installing it.
 
@@ -58,7 +58,7 @@ Each archive contains:
 On Linux or macOS, extract the downloaded archive and install the standalone binary:
 
 ```bash
-tar -xzf krestart_0.1.0_Linux_x86_64.tar.gz
+tar -xzf krestart_0.1.0_linux_amd64.tar.gz
 
 sudo install -m 0755 krestart /usr/local/bin/krestart
 ```
@@ -82,7 +82,7 @@ krestart -n production
 Extract the release archive and install the plugin executable:
 
 ```bash
-tar -xzf krestart_0.1.0_Linux_x86_64.tar.gz
+tar -xzf krestart_0.1.0_linux_amd64.tar.gz
 
 mkdir -p "$HOME/.local/bin"
 install -m 0755 kubectl-krestart "$HOME/.local/bin/kubectl-krestart"
