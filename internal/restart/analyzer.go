@@ -1,6 +1,9 @@
 package restart
 
 import (
+
+	"time"
+	"sort"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -84,14 +87,22 @@ func AnalyzeEvents(events []corev1.Event) []PodEvent {
 	results := make([]PodEvent, 0, len(events))
 
 	for _, event := range events {
-		lastSeen := event.LastTimestamp.Time
+		var lastSeen time.Time
 
-		if lastSeen.IsZero() && !event.EventTime.IsZero() {
+		if event.Series != nil {
+			lastSeen = event.Series.LastObservedTime.Time
+		}
+
+		if lastSeen.IsZero() {
 			lastSeen = event.EventTime.Time
 		}
 
-		if lastSeen.IsZero() && event.Series != nil {
-			lastSeen = event.Series.LastObservedTime.Time
+		if lastSeen.IsZero() {
+			lastSeen = event.LastTimestamp.Time
+		}
+
+		if lastSeen.IsZero() {
+			lastSeen = event.CreationTimestamp.Time
 		}
 
 		results = append(results, PodEvent{
