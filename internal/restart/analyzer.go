@@ -79,3 +79,32 @@ func AnalyzePods(pods []corev1.Pod) []PodRestart {
 
 	return results
 }
+
+func AnalyzeEvents(events []corev1.Event) []PodEvent {
+	results := make([]PodEvent, 0, len(events))
+
+	for _, event := range events {
+		lastSeen := event.LastTimestamp.Time
+
+		if lastSeen.IsZero() && !event.EventTime.IsZero() {
+			lastSeen = event.EventTime.Time
+		}
+
+		if lastSeen.IsZero() && event.Series != nil {
+			lastSeen = event.Series.LastObservedTime.Time
+		}
+
+		results = append(results, PodEvent{
+			LastSeen: lastSeen,
+			Type:     event.Type,
+			Reason:   event.Reason,
+			Message:  event.Message,
+		})
+	}
+
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].LastSeen.Before(results[j].LastSeen)
+	})
+
+	return results
+}
