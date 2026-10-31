@@ -1,0 +1,44 @@
+version: 2
+
+project_name: krestart
+
+builds:
+  - id: krestart
+    main: ./cmd/krestart
+    binary: krestart
+    env:
+      - CGO_ENABLED=0
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    ignore:
+      - goos: windows
+        goarch: arm64
+
+  - id: kubectl-krestart
+    main: ./cmd/krestart
+    binary: kubectl-krestart
+    env:
+      - CGO_ENABLED=0
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    ignore:
+      - goos: windows
+        goarch: arm64
+
+archives:
+  - formats: [tar.gz]
+    ids: [krestart, kubectl-krestart]
+    files:
+      - LICENSE
+      - README.md
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+
+checksum:
+  name_template: checksums.txt
+
+release:
+  github:
+    owner: sdmoradi
+    name: krestart
