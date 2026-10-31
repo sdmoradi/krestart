@@ -1,10 +1,9 @@
 package restart
 
 import (
-
-	"time"
-	"sort"
 	corev1 "k8s.io/api/core/v1"
+	"sort"
+	"time"
 )
 
 func ExitCodeMeaning(exitCode int32, reason string) string {
