@@ -2,40 +2,52 @@ package output
 
 import (
 	"fmt"
-	"time"
-
 	"github.com/sdmoradi/krestart/internal/restart"
+	"os"
+	"text/tabwriter"
+	"time"
 )
 
 func PrintRestartedPods(pods []restart.PodRestart) {
-	fmt.Printf(
-		"%-12s %-45s %-12s %-20s %-10s %-30s\n",
-		"NAMESPACE",
-		"POD",
-		"CONTAINER",
-		"REASON",
-		"EXIT CODE",
-		"EXIT CODE MEANING",
-	)
+	w := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
 
-	fmt.Println("----------------------------------------------------------------------------------------------------------------")
+	fmt.Fprintln(w, "NAMESPACE\tPOD\tCONTAINER\tRESTARTS\tREASON\tEXIT CODE\tEXIT CODE MEANING")
 
 	for _, pod := range pods {
 		for _, container := range pod.ContainerItems {
-			fmt.Printf(
-				"%-12s %-45s %-12s %-20s %-10d %-30s\n",
-				pod.Namespace,
-				pod.PodName,
-				container.ContainerName,
-				container.Reason,
+			fmt.Fprintf(
+				w,
+				"%s\t%s\t%s\t%d\t%s\t%d\t%s\n",
+				truncate(pod.Namespace, 15),
+				truncate(pod.PodName, 35),
+				truncate(container.ContainerName, 22),
+				container.RestartCount,
+				truncate(container.Reason, 15),
 				container.ExitCode,
-				restart.ExitCodeMeaning(
-					container.ExitCode,
-					container.Reason,
+				truncate(
+					restart.ExitCodeMeaning(
+						container.ExitCode,
+						container.Reason,
+					),
+					28,
 				),
 			)
 		}
 	}
+
+	if err := w.Flush(); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to print table: %v\n", err)
+	}
+}
+
+func truncate(s string, max int) string {
+	if len(s) <= max {
+		return s
+	}
+	if max <= 3 {
+		return s[:max]
+	}
+	return s[:max-3] + "..."
 }
 
 func PrintPodDetails(pod restart.PodRestart) {
