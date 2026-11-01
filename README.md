@@ -1,19 +1,20 @@
 # krestart
 
-A lightweight Kubernetes CLI tool and `kubectl` plugin for identifying Pods with container restarts and inspecting their restart counts, termination reasons, exit codes, and related Kubernetes events.
+A lightweight Kubernetes CLI tool and `kubectl` plugin for identifying Pods with container restarts and investigating container termination reasons, exit codes, restart counts, and related Kubernetes events.
 
 Use it as a standalone CLI or directly through `kubectl`:
 
 ```bash
-krestart -n production
-kubectl krestart -n production
+restart-info -n production
+kubectl restart-info -n production
 ```
 
 ## Features
 
-- Find restarted Pods across all namespaces or within a specific namespace.
+- Find Pods with restarted containers across all namespaces or within a specific namespace.
 - Inspect restart details for a specific Pod.
-- Display container termination reasons, exit codes, and exit code meanings.
+- Display container restart counts, termination reasons, and exit codes.
+- Show exit code meanings to help diagnose container failures.
 - View Kubernetes events associated with a specific Pod.
 - Use standard Kubernetes kubeconfig loading and current-context selection.
 - Specify a custom kubeconfig file with `--kubeconfig`.
@@ -30,6 +31,54 @@ Go 1.22 or later is only required when building from source.
 
 ## Installation
 
+### Install using Krew
+
+[Krew](https://krew.sigs.k8s.io/) is the plugin manager for `kubectl`.
+
+If you already have Krew installed, install `restart-info` directly:
+
+```bash
+kubectl krew install restart-info
+```
+
+Verify the installation:
+
+```bash
+kubectl plugin list
+```
+
+Run the plugin:
+
+```bash
+kubectl restart-info
+```
+
+Upgrade to the latest published version:
+
+```bash
+kubectl krew upgrade restart-info
+```
+
+Uninstall:
+
+```bash
+kubectl krew uninstall restart-info
+```
+
+For Krew installation instructions, see the [official Krew documentation](https://krew.sigs.k8s.io/docs/user-guide/setup/install/).
+
+### Install using a local Krew manifest
+
+If you want to install the plugin directly from a manifest file before submitting it to the official Krew index:
+
+```bash
+kubectl krew install --manifest=./plugins/restart-info.yaml
+```
+
+Replace the manifest path with the location of your local manifest.
+
+This method is useful for testing manifest changes before submitting them to the Krew index.
+
 ### Download a prebuilt release
 
 Download the appropriate archive for your operating system and architecture from the [GitHub Releases](https://github.com/sdmoradi/krestart/releases) page.
@@ -38,18 +87,18 @@ Available release archives:
 
 | Platform | Architecture | Archive |
 |---|---|---|
-| Linux | amd64 | `krestart_0.1.0_linux_amd64.tar.gz` |
-| Linux | arm64 | `krestart_0.1.0_linux_arm64.tar.gz` |
-| macOS | amd64 | `krestart_0.1.0_darwin_amd64.tar.gz` |
-| macOS | arm64 | `krestart_0.1.0_darwin_arm64.tar.gz` |
-| Windows | amd64 | `krestart_0.1.0_windows_amd64.zip` |
+| Linux | amd64 | `krestart_0.1.2_linux_amd64.tar.gz` |
+| Linux | arm64 | `krestart_0.1.2_linux_arm64.tar.gz` |
+| macOS | amd64 | `krestart_0.1.2_darwin_amd64.tar.gz` |
+| macOS | arm64 | `krestart_0.1.2_darwin_arm64.tar.gz` |
+| Windows | amd64 | `krestart_0.1.2_windows_amd64.zip` |
 
 Verify the downloaded archive against `checksums.txt` from the same release before installing it.
 
 Each archive contains:
 
-- `krestart` — standalone CLI executable.
-- `kubectl-krestart` — executable for the kubectl plugin interface.
+- `restart-info` — standalone CLI executable.
+- `kubectl-restart-info` — executable for the kubectl plugin interface.
 - `LICENSE`
 - `README.md`
 
@@ -58,9 +107,9 @@ Each archive contains:
 On Linux or macOS, extract the downloaded archive and install the standalone binary:
 
 ```bash
-tar -xzf krestart_0.1.0_linux_amd64.tar.gz
+tar -xzf krestart_0.1.2_linux_amd64.tar.gz
 
-sudo install -m 0755 krestart /usr/local/bin/krestart
+sudo install -m 0755 restart-info /usr/local/bin/restart-info
 ```
 
 Replace the archive name with the one matching your platform and architecture.
@@ -68,24 +117,24 @@ Replace the archive name with the one matching your platform and architecture.
 Verify the installation:
 
 ```bash
-krestart --help
+restart-info --help
 ```
 
 Run:
 
 ```bash
-krestart -n production
+restart-info -n production
 ```
 
-### Install as a kubectl plugin
+### Install manually as a kubectl plugin
 
 Extract the release archive and install the plugin executable:
 
 ```bash
-tar -xzf krestart_0.1.0_linux_amd64.tar.gz
+tar -xzf krestart_0.1.2_linux_amd64.tar.gz
 
 mkdir -p "$HOME/.local/bin"
-install -m 0755 kubectl-krestart "$HOME/.local/bin/kubectl-krestart"
+install -m 0755 kubectl-restart-info "$HOME/.local/bin/kubectl-restart-info"
 ```
 
 Ensure `$HOME/.local/bin` is included in your `PATH`:
@@ -110,70 +159,66 @@ kubectl plugin list
 Run it:
 
 ```bash
-kubectl krestart -n production
+kubectl restart-info -n production
 ```
 
-The plugin accepts the same arguments as the standalone CLI.
-
-**Windows:** Extract the Windows archive and place `kubectl-krestart.exe` or `krestart.exe` in a directory included in your `PATH`.
+**Windows:** Extract the Windows archive and place `kubectl-restart-info.exe` or `restart-info.exe` in a directory included in your `PATH`.
 
 ## Usage
 
-### Standalone CLI
+### Help
+
+Display available commands, flags, descriptions, and examples:
+
+```bash
+restart-info --help
+```
+
+Or through kubectl:
+
+```bash
+kubectl restart-info --help
+```
+
+### Find restarted Pods
 
 Find restarted Pods across all namespaces:
 
 ```bash
-krestart
+kubectl restart-info
 ```
 
 Find restarted Pods in a specific namespace:
 
 ```bash
-krestart -n production
+kubectl restart-info -n production
 ```
 
-Inspect a specific Pod:
+### Inspect a specific Pod
+
+Display detailed container restart information and related Kubernetes events:
 
 ```bash
-krestart -n production -p pod-name
+kubectl restart-info -n production -p api-7d9f8c
 ```
 
-Use a custom kubeconfig:
+### Use a custom kubeconfig
 
 ```bash
-krestart --kubeconfig /path/to/kubeconfig -n production
+kubectl restart-info --kubeconfig /path/to/kubeconfig -n production
 ```
 
-### kubectl Plugin
-
-Find restarted Pods across all namespaces:
+The standalone CLI accepts the same arguments:
 
 ```bash
-kubectl krestart
-```
-
-Find restarted Pods in a specific namespace:
-
-```bash
-kubectl krestart -n production
-```
-
-Inspect a specific Pod:
-
-```bash
-kubectl krestart -n production -p pod-name
-```
-
-Use a custom kubeconfig:
-
-```bash
-kubectl krestart --kubeconfig /path/to/kubeconfig -n production
+restart-info -n production
+restart-info -n production -p api-7d9f8c
+restart-info --kubeconfig /path/to/kubeconfig -n production
 ```
 
 ## Kubernetes Configuration
 
-`krestart` uses the standard Kubernetes client configuration loading rules.
+`restart-info` uses the standard Kubernetes client configuration loading rules.
 
 The configuration is loaded from:
 
@@ -189,13 +234,13 @@ For example:
 kubectl config get-contexts
 kubectl config use-context staging
 
-kubectl krestart -n production
+kubectl restart-info -n production
 ```
 
 You can also use a separate kubeconfig file without changing your default configuration:
 
 ```bash
-kubectl krestart --kubeconfig /path/to/kubeconfig -n production
+kubectl restart-info --kubeconfig /path/to/kubeconfig -n production
 ```
 
 ## Example Output
@@ -234,13 +279,13 @@ cd krestart
 Build the standalone CLI:
 
 ```bash
-go build -o krestart ./cmd/krestart
+go build -o restart-info ./cmd/krestart
 ```
 
 Build the kubectl plugin:
 
 ```bash
-go build -o kubectl-krestart ./cmd/krestart
+go build -o kubectl-restart-info ./cmd/krestart
 ```
 
 ### Run Without Building
@@ -253,6 +298,12 @@ Run for a specific namespace:
 
 ```bash
 go run ./cmd/krestart -n production
+```
+
+Display help:
+
+```bash
+go run ./cmd/krestart --help
 ```
 
 ### Project Structure
@@ -271,6 +322,8 @@ krestart/
 │   │   └── analyzer_test.go
 │   └── output/
 │       └── table.go
+├── plugins/
+│   └── restart-info.yaml
 ├── go.mod
 ├── go.sum
 ├── README.md
@@ -297,7 +350,9 @@ go build ./...
 
 ## Contributing
 
-Contributions, bug reports, and suggestions are welcome. For code changes, run the tests and build checks before submitting a pull request.
+Contributions, bug reports, and suggestions are welcome.
+
+For code changes, run the tests and build checks before submitting a pull request.
 
 ## License
 
