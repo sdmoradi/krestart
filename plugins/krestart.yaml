@@ -3,7 +3,7 @@ kind: Plugin
 metadata:
   name: krestart
 spec:
-  version: v0.1.0
+  version: v0.1.1
   homepage: https://github.com/sdmoradi/krestart
   shortDescription: Inspect Pod restarts
   description: |
@@ -17,7 +17,7 @@ spec:
         matchLabels:
           os: linux
           arch: amd64
-      uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.0/krestart_0.1.0_linux_amd64.tar.gz
+      uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.1/krestart_0.1.1_linux_amd64.tar.gz
       sha256: 40d05d11a3f77d98ca0fc3102a4388f108333545419eac81e821c9f3907a7b7f
       bin: krestart
       files:
@@ -30,7 +30,7 @@ spec:
         matchLabels:
           os: linux
           arch: arm64
-      uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.0/krestart_0.1.0_linux_arm64.tar.gz
+      uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.1/krestart_0.1.1_linux_arm64.tar.gz
       sha256: 9a05c692ff75cb3637f7b43210c72a3dae749900d86798aa8a3f96f79ae0b80d
       bin: krestart
       files:
@@ -43,7 +43,7 @@ spec:
         matchLabels:
           os: darwin
           arch: amd64
-      uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.0/krestart_0.1.0_darwin_amd64.tar.gz
+      uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.1/krestart_0.1.1_darwin_amd64.tar.gz
       sha256: d1c525b42f753a894f32548bc45eaf4951bb5ecc9dcb012966d1b01b168703e1
       bin: krestart
       files:
@@ -56,7 +56,7 @@ spec:
         matchLabels:
           os: darwin
           arch: arm64
-      uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.0/krestart_0.1.0_darwin_arm64.tar.gz
+      uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.1/krestart_0.1.1_darwin_arm64.tar.gz
       sha256: 8b1b7e2e1ce468f0ecf7b6af22498590f3db24305cd2915c027760a80ed697e9
       bin: krestart
       files:
@@ -69,7 +69,7 @@ spec:
         matchLabels:
           os: windows
           arch: amd64
-      uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.0/krestart_0.1.0_windows_amd64.zip
+      uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.1/krestart_0.1.1_windows_amd64.zip
       sha256: 161fc64f6436d9ab95c9133862ce7fb0a5170ef96786c1bdb96f613e4a301f3d
       bin: krestart.exe
       files:
