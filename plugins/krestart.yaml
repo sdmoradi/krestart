@@ -1,79 +1,74 @@
 apiVersion: krew.googlecontainertools.github.com/v1alpha2
 kind: Plugin
 metadata:
-  name: krestart
+  name: restart-info
 spec:
-  version: v0.1.1
+  version: "v0.1.1"
   homepage: https://github.com/sdmoradi/krestart
-  shortDescription: Inspect Pod restarts
+  shortDescription: Inspect Pod restarts.
   description: |
     Identify Kubernetes Pods with container restarts and inspect their
     restart counts, termination reasons, exit codes, and related events.
     Supports all namespaces or a selected namespace, and inspection of
     individual Pods.
-
   platforms:
-    - selector:
-        matchLabels:
-          os: linux
-          arch: amd64
-      uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.1/krestart_0.1.1_linux_amd64.tar.gz
-      sha256: 40d05d11a3f77d98ca0fc3102a4388f108333545419eac81e821c9f3907a7b7f
-      bin: krestart
-      files:
-        - from: kubectl-krestart
-          to: krestart
-        - from: LICENSE
-          to: LICENSE
-
-    - selector:
-        matchLabels:
-          os: linux
-          arch: arm64
-      uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.1/krestart_0.1.1_linux_arm64.tar.gz
-      sha256: 9a05c692ff75cb3637f7b43210c72a3dae749900d86798aa8a3f96f79ae0b80d
-      bin: krestart
-      files:
-        - from: kubectl-krestart
-          to: krestart
-        - from: LICENSE
-          to: LICENSE
-
-    - selector:
-        matchLabels:
-          os: darwin
-          arch: amd64
-      uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.1/krestart_0.1.1_darwin_amd64.tar.gz
-      sha256: d1c525b42f753a894f32548bc45eaf4951bb5ecc9dcb012966d1b01b168703e1
-      bin: krestart
-      files:
-        - from: kubectl-krestart
-          to: krestart
-        - from: LICENSE
-          to: LICENSE
-
-    - selector:
-        matchLabels:
-          os: darwin
-          arch: arm64
-      uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.1/krestart_0.1.1_darwin_arm64.tar.gz
-      sha256: 8b1b7e2e1ce468f0ecf7b6af22498590f3db24305cd2915c027760a80ed697e9
-      bin: krestart
-      files:
-        - from: kubectl-krestart
-          to: krestart
-        - from: LICENSE
-          to: LICENSE
-
-    - selector:
-        matchLabels:
-          os: windows
-          arch: amd64
-      uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.1/krestart_0.1.1_windows_amd64.zip
-      sha256: 161fc64f6436d9ab95c9133862ce7fb0a5170ef96786c1bdb96f613e4a301f3d
-      bin: krestart.exe
-      files:
-        - from: kubectl-krestart.exe
-          to: krestart.exe
-        - from: LICENSE
-          to: LICENSE
+  - uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.1/krestart_0.1.1_linux_amd64.tar.gz
+    sha256: 89a84f0eab62335f78ccbf25aac0ce8d97f67e810d2ec667eb260b2a06397184
+    bin: restart-info
+    files:
+    - from: ./kubectl-krestart
+      to: restart-info
+    - from: ./LICENSE
+      to: .
+    selector:
+      matchLabels:
+        os: linux
+        arch: amd64
+  - uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.1/krestart_0.1.1_linux_arm64.tar.gz
+    sha256: ac8829a5497c234889ff606fea270868e1bbc8761508795cd9762d2102561d29
+    bin: restart-info
+    files:
+    - from: ./kubectl-krestart
+      to: restart-info
+    - from: ./LICENSE
+      to: .
+    selector:
+      matchLabels:
+        os: linux
+        arch: arm64
+  - uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.1/krestart_0.1.1_darwin_amd64.tar.gz
+    sha256: c53c55979755b0a3f6606383b839246c2cc2cccee1dd63b57fc6170a3998d1a8
+    bin: restart-info
+    files:
+    - from: ./kubectl-krestart
+      to: restart-info
+    - from: ./LICENSE
+      to: .
+    selector:
+      matchLabels:
+        os: darwin
+        arch: amd64
+  - uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.1/krestart_0.1.1_darwin_arm64.tar.gz
+    sha256: 5ca24400611316b1e9893137948ec869572c1ec7ba06d5c76d2dd32cdb5c3a50
+    bin: restart-info
+    files:
+    - from: ./kubectl-krestart
+      to: restart-info
+    - from: ./LICENSE
+      to: .
+    selector:
+      matchLabels:
+        os: darwin
+        arch: arm64
+  - uri: https://github.com/sdmoradi/krestart/releases/download/v0.1.1/krestart_0.1.1_windows_amd64.zip
+    sha256: cfac1a7cf7b827ef947b9c49b4b71c541c67c39e2ef8266e0adfb418aedda26e
+    bin: restart-info.exe
+    files:
+    - from: ./kubectl-krestart.exe
+      to: restart-info.exe
+    - from: ./LICENSE
+      to: .
+    selector:
+      matchLabels:
+        os: windows
+        arch: amd64
