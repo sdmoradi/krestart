@@ -19,9 +19,52 @@ func main() {
 }
 
 func run() error {
-	namespace := flag.String("n", "", "Kubernetes namespace")
-	podName := flag.String("p", "", "Kubernetes pod name")
+	namespace := flag.String("n", "", "Kubernetes namespace (default: all namespaces)")
+	podName := flag.String("p", "", "Kubernetes Pod name")
 	kubeconfig := flag.String("kubeconfig", "", "Path to kubeconfig file")
+
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), `restart-info - Kubernetes Container Restart Inspector
+
+Inspect Kubernetes Pods, identify container restarts, and investigate
+termination reasons, exit codes, and related events.
+
+USAGE:
+  kubectl restart-info [flags]
+
+FLAGS:
+  -n string
+        Kubernetes namespace (default: all namespaces)
+
+  -p string
+        Kubernetes Pod name (use with -n to identify the Pod's namespace)
+
+  -kubeconfig string
+        Path to kubeconfig file (default: use standard kubeconfig loading rules)
+
+  -h, -help
+        Display this help information
+
+EXAMPLES:
+  # Inspect restarted containers across all namespaces
+  kubectl restart-info
+
+  # Inspect restarted containers in a specific namespace
+  kubectl restart-info -n production
+
+  # Inspect a specific Pod and its related events
+  kubectl restart-info -n production -p api-7d9f8c
+
+  # Use a specific kubeconfig file
+  kubectl restart-info -kubeconfig ~/.kube/production
+
+WHAT YOU GET:
+  - Container restart counts
+  - Last termination reason and exit code
+  - Related Kubernetes events
+
+`)
+	}
 
 	flag.Parse()
 
